@@ -11,7 +11,7 @@ echo " Updating YUM" | tee -a LinuxSetup.log
 echo "" | tee -a LinuxSetup.log
 sleep 1
 
-sudo yum update
+sudo yum -y update
 
 echo "" | tee -a LinuxSetup.log
 date | tr "\n" ":" | tee -a LinuxSetup.log
