@@ -17,30 +17,7 @@ echo "" | tee -a LinuxSetup.log
 date | tr "\n" ":" | tee -a LinuxSetup.log
 echo " YUM update complete." | tee -a LinuxSetup.log
 
-echo "" | tee -a LinuxSetup.log
-date | tr "\n" ":" | tee -a LinuxSetup.log
-echo " Installing SSH." | tee -a LinuxSetup.log
-sleep 1
-sudo yum -y install openssh-server
 
-date | tr "\n" ":" | tee -a LinuxSetup.log
-if [ $? == 0 ]; then
- echo " SSH Installation successful." | tee -a LinuxSetup.log
- date | tr "\n" ":" | tee -a LinuxSetup.log
- echo " Starting and enabling SSHD." | tee -a LinuxSetup.log
- sleep 1
- sudo systemctl start sshd
- sudo systemctl enable sshd
- sudo systemctl status sshd
-  date | tr "\n" ":" | tee -a LinuxSetup.log
-  if [ $? == 0 ]; then
-   echo " SSH starting and enablement successful." | tee -a LinuxSetup.log
-  else
-   echo " SSH starting and enablement unsuccessful." | tee -a LinuxSetup.log
-  fi
-else
- echo " SSH Installation unsuccessful." | tee -a LinuxSetup.log
-fi
 
 echo "" | tee -a LinuxSetup.log
 date | tr "\n" ":" | tee -a LinuxSetup.log
