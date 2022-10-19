@@ -43,6 +43,12 @@ date | tr "\n" ":" | tee -a LinuxSetup.log
 
 echo "" | tee -a LinuxSetup.log
 date | tr "\n" ":" | tee -a LinuxSetup.log
+echo " Installing phpmyadmin." | tee -a LinuxSetup.log
+sudo apt -y install phpmyadmin
+date | tr "\n" ":" | tee -a LinuxSetup.log
+
+echo "" | tee -a LinuxSetup.log
+date | tr "\n" ":" | tee -a LinuxSetup.log
 echo " Create the root web directory for your_domain." | tee -a LinuxSetup.log
 sudo mkdir /var/www/your_domain
 sudo chown -R $USER:$USER /var/www/your_domain
