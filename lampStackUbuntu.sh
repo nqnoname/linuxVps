@@ -9,6 +9,12 @@
 #                 Nothing will be re-installed except for the packages with errors.
 ###################################################################
 
+# Log file
+while getopts "r" opt
+do
+ rm -f LinuxSetup.log
+done
+
 # Color Reset
 Color_Off='\033[0m'       # Reset
 
@@ -19,6 +25,15 @@ Yellow='\033[0;33m'       # Yellow
 Blue='\033[0;34m'         # Blue
 Purple='\033[0;35m'       # Purple
 Cyan='\033[0;36m'         # Cyan
+
+# Sync time
+echo "" | tee -a LinuxSetup.log
+date | tr "\n" ":" | tee -a LinuxSetup.log
+echo " Synchronizing time." | tee -a LinuxSetup.log
+sudo ntpdate time.google.com
+sudo timedatectl set-timezone "Asia/Ho_Chi_Minh"
+date | tr "\n" ":" | tee -a LinuxSetup.log
+echo " Synchronization complete." | tee -a LinuxSetup.log
 
 # GENERATE PASSOWRDS
 # sudo apt -qy install openssl # openssl used for generating a truly random password
@@ -32,6 +47,8 @@ update() {
 	echo -e "\n ${Cyan} Updating package repositories.. ${Color_Off}"
 	sudo apt -y update 
 	
+	echo "" | tee -a LinuxSetup.log
+	date | tr "\n" ":" | tee -a LinuxSetup.log
 }
 
 installNginx() {
@@ -39,6 +56,8 @@ installNginx() {
 	echo -e "\n ${Cyan} Installing Nginx.. ${Color_Off}"
 	sudo apt -y install nginx
 	
+	echo "" | tee -a LinuxSetup.log
+	date | tr "\n" ":" | tee -a LinuxSetup.log
 }
 
 installLetsEncryptCertbot() {
@@ -50,6 +69,9 @@ installLetsEncryptCertbot() {
   sudo add-apt-repository ppa:certbot/certbot -y # add Certbot repo
   sudo apt update # update repo sources
   sudo apt install -y python-certbot-nginx # install Certbot
+  
+  	echo "" | tee -a LinuxSetup.log
+	date | tr "\n" ":" | tee -a LinuxSetup.log
 }
 
 
@@ -69,6 +91,9 @@ installPHP() {
 	# PHP7 (latest)
 	# sudo apt -qy install php php-common libapache2-mod-php php-curl php-dev php-gd php-gettext php-imagick php-intl php-mbstring php-mysql php-pear php-pspell php-recode php-xml php-zip
 	sudo apt -qy install php-fpm php-mysql
+	
+	echo "" | tee -a LinuxSetup.log
+	date | tr "\n" ":" | tee -a LinuxSetup.log
 }
 
 installMySQL() {
@@ -81,6 +106,9 @@ installMySQL() {
 	
 	# DEBIAN_FRONTEND=noninteractive # by setting this to non-interactive, no questions will be asked
 	DEBIAN_FRONTEND=noninteractive sudo apt -qy install mysql-server mysql-client
+	
+	echo "" | tee -a LinuxSetup.log
+	date | tr "\n" ":" | tee -a LinuxSetup.log
 }
 
 secureMySQL() {
@@ -93,6 +121,9 @@ DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
 FLUSH PRIVILEGES;
 EOFMYSQLSECURE
+
+	echo "" | tee -a LinuxSetup.log
+	date | tr "\n" ":" | tee -a LinuxSetup.log
 
 # NOTE: Skipped validate_password because it'll cause issues with the generated password in this script
 }
@@ -110,23 +141,29 @@ installPHPMyAdmin() {
 	sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/internal/skip-preseed boolean true"
 
 	DEBIAN_FRONTEND=noninteractive sudo apt -qy install phpmyadmin
+	
+	echo "" | tee -a LinuxSetup.log
+	date | tr "\n" ":" | tee -a LinuxSetup.log
 }
 
 
-enableMods() {
+#enableMods() {
 	# Enable mod_rewrite, required for WordPress permalinks and .htaccess files
-	echo -e "\n ${Cyan} Enabling Modules.. ${Color_Off}"
+	#echo -e "\n ${Cyan} Enabling Modules.. ${Color_Off}"
 
-	sudo a2enmod rewrite
+	#sudo a2enmod rewrite
 	# php5enmod mcrypt # PHP5 on Ubuntu 14.04 LTS
 	# phpenmod -v 5.6 mcrypt mbstring # PHP5 on Ubuntu 17.04
-	sudo phpenmod mbstring # PHP7
-}
+	#sudo phpenmod mbstring # PHP7
+#}
 
 setPermissions() {
 	# Permissions
-	echo -e "\n ${Cyan} Setting Ownership for /var/www.. ${Color_Off}"
-	sudo chown -R www-data:www-data /var/www
+	echo -e "\n ${Cyan} Create the root web directory for your_domain & Setting Ownership for /var/www.. ${Color_Off}" | tee -a LinuxSetup.log
+	#sudo chown -R www-data:www-data /var/www
+	sudo mkdir /var/www/your_domain
+	sudo chown -R $USER:$USER /var/www/your_domain
+	date | tr "\n" ":" | tee -a LinuxSetup.log
 }
 
 restartApache() {
@@ -137,17 +174,28 @@ restartApache() {
 
 # RUN
 update
-installApache
+installNginx
 installLetsEncryptCertbot
 installPHP
 installMySQL
 secureMySQL
 installPHPMyAdmin
-enableMods
+#enableMods
 setPermissions
-restartApache
+#restartApache
 
 echo -e "\n${Green} SUCCESS! MySQL password is: ${PASS_MYSQL_ROOT} ${Color_Off}"
+
+date | tr "\n" ":" | tee -a LinuxSetup.log
+echo " Performing cleanup." | tee -a LinuxSetup.log
+sudo package-cleanup --problems
+sudo package-cleanup --orphans
+sudo apt autoremove
+sudo apt clean all
+echo ""
+echo ""
+echo "Linux setup script execution complete. Please run cat LinuxSetup.log command to see the complete log."
+sleep 2
 
 # TODO
 # - [x] Figure out why it is asking for MySQL password and not just taking it from the variable in heredoc (cz: to avoid redirection, programs don't let heredoc enter passwords)
