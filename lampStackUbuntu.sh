@@ -1,10 +1,7 @@
 #!/bin/bash
 
 ###################################################################
-#         Author: Aamnah Akram
-#           Link: http://github.com/aamnah/bash-scripts
-#    Description: Installs an AMP stack and PHPMyAdmin plus tweaks. For Debian based systems.
-#            Run: bash install_lamp_debian.sh
+#    Description: Installs an LEMP stack and PHPMyAdmin plus tweaks. For Debian based systems.
 #          Notes: In case of any errors (e.g. MySQL) just re-run the script. 
 #                 Nothing will be re-installed except for the packages with errors.
 ###################################################################
@@ -35,6 +32,26 @@ sudo timedatectl set-timezone "Asia/Ho_Chi_Minh"
 date | tr "\n" ":" | tee -a LinuxSetup.log
 echo " Synchronization complete." | tee -a LinuxSetup.log
 
+#Tạo Swap
+sudo su
+sudo dd if=/dev/zero of=/swapfile bs=1024 count=2046k
+mkswap /swapfile
+swapon /swapfile
+echo /swapfile none swap defaults 0 0 >> /etc/fstab
+chown root:root /swapfile 
+chmod 0600 /swapfile
+sysctl vm.swappiness=10
+
+# Để đảm bảo giữ nguyên thông số này mỗi khi khởi động lại VPS bạn cần điều chỉnh tham số vm.swappiness ở cuối file /etc/sysctl.conf 
+# (nếu không có bạn hãy add thủ công vào)
+# nano /etc/sysctl.conf
+# Thêm dòng sau vào cuối nếu chưa có, nếu có rồi thì update lại giá trị:
+# vm.swappiness = 10
+# Nhấn Ctrl + o để lưu, Enter, và Ctrl + X để thoát nano.
+# Khởi động lại VPS và kiểm tra lại kết quả:
+# swapon -s
+# cat /proc/sys/vm/swappiness
+
 # GENERATE PASSOWRDS
 # sudo apt -qy install openssl # openssl used for generating a truly random password
 PASS_MYSQL_ROOT=`openssl rand -base64 12` # this you need to save 
@@ -64,11 +81,7 @@ installLetsEncryptCertbot() {
   # Let's Encrypt SSL 
   echo -e "\n ${Cyan} Installing Let's Encrypt SSL.. ${Color_Off}"
 
-  sudo apt update # update repo sources
-  sudo apt install -y software-properties-common # required in order to add a repo
-  sudo add-apt-repository ppa:certbot/certbot -y # add Certbot repo
-  sudo apt update # update repo sources
-  sudo apt install -y python-certbot-nginx # install Certbot
+  sudo apt -y install certbot
   
   	echo "" | tee -a LinuxSetup.log
 	date | tr "\n" ":" | tee -a LinuxSetup.log
@@ -90,6 +103,7 @@ installPHP() {
 
 	# PHP7 (latest)
 	# sudo apt -qy install php php-common libapache2-mod-php php-curl php-dev php-gd php-gettext php-imagick php-intl php-mbstring php-mysql php-pear php-pspell php-recode php-xml php-zip
+	
 	sudo apt -qy install php-fpm php-mysql
 	
 	echo "" | tee -a LinuxSetup.log
@@ -166,11 +180,11 @@ setPermissions() {
 	date | tr "\n" ":" | tee -a LinuxSetup.log
 }
 
-restartApache() {
-	# Restart Apache
-	echo -e "\n ${Cyan} Restarting Apache.. ${Color_Off}"
-	sudo service apache2 restart
-}
+#restartApache() {
+#	# Restart Apache
+#	echo -e "\n ${Cyan} Restarting Apache.. ${Color_Off}"
+#	sudo service apache2 restart
+#}
 
 # RUN
 update
@@ -208,3 +222,7 @@ sleep 2
 # https://serversforhackers.com/c/installing-mysql-with-debconf
 # https://gist.github.com/Mins/4602864
 # https://gercogandia.blogspot.com/2012/11/automatic-unattended-install-of.html
+# http://github.com/aamnah/bash-scripts
+# https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-ubuntu-20-04
+# https://hocvps.com/bat-dau/
+# https://arctris.com/2021/05/automating-your-linux-setup/
