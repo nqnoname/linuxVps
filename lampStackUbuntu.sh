@@ -33,14 +33,14 @@ date | tr "\n" ":" | tee -a LinuxSetup.log
 echo " Synchronization complete." | tee -a LinuxSetup.log
 
 #Tạo Swap
-sudo su
+#sudo su
 sudo dd if=/dev/zero of=/swapfile bs=1024 count=2046k
-mkswap /swapfile
-swapon /swapfile
-echo /swapfile none swap defaults 0 0 >> /etc/fstab
-chown root:root /swapfile 
-chmod 0600 /swapfile
-sysctl vm.swappiness=10
+sudo mkswap /swapfile
+sudo swapon /swapfile
+sudo echo /swapfile none swap defaults 0 0 >> /etc/fstab
+sudo chown root:root /swapfile 
+sudo chmod 0600 /swapfile
+sudo sysctl vm.swappiness=10
 
 # Để đảm bảo giữ nguyên thông số này mỗi khi khởi động lại VPS bạn cần điều chỉnh tham số vm.swappiness ở cuối file /etc/sysctl.conf 
 # (nếu không có bạn hãy add thủ công vào)
