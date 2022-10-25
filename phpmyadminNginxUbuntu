@@ -1,0 +1,34 @@
+# Once the apt install command completes, phpMyAdmin will be fully installed. 
+# However, for the Nginx web server to find and serve the phpMyAdmin files correctly, 
+# you’ll need to create a symbolic link from the installation files to Nginx’s document root directory.
+# Use SSH tunnel to connect to phpmyadmin
+
+sudo ln -s /usr/share/phpmyadmin /var/www/your_domain/phpmyadmin
+sudo nano /etc/nginx/sites-available/your_domain
+      server {
+              . . .
+
+              location ^~ /phpmyadmin/ {      
+                      allow 127.0.0.1; #allow localhost via SSH tunnels
+                      deny all; #deny all other sources
+
+                      location ~ \.php$ {
+                              include snippets/fastcgi-php.conf;
+                              fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+                      }
+              }
+
+              . . .
+      }
+
+#config nginx 
+sudo nano /etc/nginx/nginx.conf
+# manually add to nginx.conf
+#        fastcgi_buffers 8 16k;
+#        fastcgi_buffer_size 32k;
+#        fastcgi_connect_timeout 300000;
+#        fastcgi_send_timeout 300000;
+#        fastcgi_read_timeout 300000;
+#        client_header_timeout 300000;
+#        client_body_timeout 300000;
+#        client_max_body_size 200M;
