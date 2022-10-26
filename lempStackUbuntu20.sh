@@ -32,15 +32,16 @@ sudo timedatectl set-timezone "Asia/Ho_Chi_Minh"
 date | tr "\n" ":" | tee -a LinuxSetup.log
 echo " Synchronization complete." | tee -a LinuxSetup.log
 
-#Tạo Swap
-#sudo su
-sudo dd if=/dev/zero of=/swapfile bs=1024 count=2046k
-sudo mkswap /swapfile
-sudo swapon /swapfile
-sudo echo /swapfile none swap defaults 0 0 >> /etc/fstab
-sudo chown root:root /swapfile 
-sudo chmod 0600 /swapfile
-sudo sysctl vm.swappiness=10
+# Tạo Swap
+createSwap() {
+	sudo dd if=/dev/zero of=/swapfile bs=1024 count=2046k
+	sudo mkswap /swapfile
+	sudo swapon /swapfile
+	sudo echo /swapfile none swap defaults 0 0 >> /etc/fstab
+	sudo chown root:root /swapfile 
+	sudo chmod 600 /swapfile
+	sudo sysctl vm.swappiness=10
+}
 
 # Để đảm bảo giữ nguyên thông số này mỗi khi khởi động lại VPS bạn cần điều chỉnh tham số vm.swappiness ở cuối file /etc/sysctl.conf 
 # (nếu không có bạn hãy add thủ công vào)
@@ -164,7 +165,6 @@ installPHPMyAdmin() {
 #enableMods() {
 	# Enable mod_rewrite, required for WordPress permalinks and .htaccess files
 	#echo -e "\n ${Cyan} Enabling Modules.. ${Color_Off}"
-
 	#sudo a2enmod rewrite
 	# php5enmod mcrypt # PHP5 on Ubuntu 14.04 LTS
 	# phpenmod -v 5.6 mcrypt mbstring # PHP5 on Ubuntu 17.04
@@ -188,6 +188,7 @@ setPermissions() {
 
 # RUN
 update
+createSwap
 installNginx
 installLetsEncryptCertbot
 installPHP
