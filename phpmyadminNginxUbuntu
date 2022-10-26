@@ -21,7 +21,37 @@ sudo nano /etc/nginx/sites-available/your_domain
               . . .
       }
 
-#config nginx 
+# Config nginx 
+      # assign ownership of the directory for current system user
+            sudo chown -R $USER:$USER /var/www/your_domain
+
+      # open a new configuration file in Nginx’s sites-available directory. This will create a new blank file
+      
+server {
+    listen 80;
+    server_name your_domain www.your_domain;
+    root /var/www/your_domain;
+
+    index index.html index.htm index.php;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+     }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+}
+      
+      
+      
+            sudo nano /etc/nginx/sites-available/your_domain
 sudo nano /etc/nginx/nginx.conf
 # manually add to nginx.conf
 #        fastcgi_buffers 8 16k;
