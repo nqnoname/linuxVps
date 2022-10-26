@@ -3,8 +3,11 @@
 # you’ll need to create a symbolic link from the installation files to Nginx’s document root directory.
 # Use SSH tunnel to connect to phpmyadmin
 
-sudo ln -s /usr/share/phpmyadmin /var/www/your_domain/phpmyadmin
-sudo nano /etc/nginx/sites-available/your_domain
+#link phpmyadmin 
+
+sudo mkdir /var/www/phpmyadmin
+sudo ln -s /usr/share/phpmyadmin /var/www/phpmyadmin/phpmyadmin
+sudo nano /etc/nginx/sites-available/phpmyadmin
       server {
               . . .
 
@@ -20,6 +23,8 @@ sudo nano /etc/nginx/sites-available/your_domain
 
               . . .
       }
+sudo ln -s /etc/nginx/sites-available/phpmyadmin /etc/nginx/sites-enabled/
+
 
 # Config nginx 
       # assign ownership of the directory for current system user
@@ -51,7 +56,7 @@ server {
       
       
       
-            sudo nano /etc/nginx/sites-available/your_domain
+            
 sudo nano /etc/nginx/nginx.conf
 # manually add to nginx.conf
 #        fastcgi_buffers 8 16k;
