@@ -3,8 +3,7 @@
 ###################################################################
 #         Author: Aamnah Akram
 #           Link: http://github.com/aamnah/bash-scripts
-#    Description: Sets up a domain for hosting
-#            Run: bash setup_virtualhost.sh mydomain.com
+#    Description: Apache VirtualHost with Wildcard SSL
 ###################################################################
 
 # TO-DO
@@ -161,13 +160,19 @@ createConf() {
 }
 
 installCertbot() {
-  # install Let's Encrypt Certbot
-  sudo apt-get update -qq 
-  sudo apt-get install -qq software-properties-common
-  sudo add-apt-repository universe
-  sudo add-apt-repository ppa:certbot/certbot
-  sudo apt-get update -qq 
-  sudo apt-get install -qq certbot python3-certbot-apache
+  # Remove certbot-auto and any Certbot OS packages
+  sudo apt -y remove certbot
+
+  # install Let's Encrypt Certbot - Apache plugin
+  # Run the following command, which will install two packages: certbot and python3-certbot-apache.
+  # The latter is a plugin that integrates Certbot with Apache, so that it’s possible to automate obtaining a certificate and configuring HTTPS 
+  # within your web server with a single command:
+  sudo apt -y install certbot python3-certbot-apache
+
+  # Obtaining an SSL Certificate
+  # Certbot provides a variety of ways to obtain SSL certificates through plugins. 
+  # The Apache plugin will take care of reconfiguring Apache and reloading the configuration whenever necessary:
+  sudo certbot --apache
 }
 
 installSSL() {
