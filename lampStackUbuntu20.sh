@@ -1,10 +1,7 @@
 #!/bin/bash
 
 ###################################################################
-#         Author: Aamnah Akram
-#           Link: http://github.com/aamnah/bash-scripts
-#    Description: Installs an AMP stack and PHPMyAdmin plus tweaks. For Debian based systems.
-#            Run: bash install_lamp_debian.sh
+#    Description: Installs an AMP stack and PHPMyAdmin plus tweaks. For Debian based systems.            
 #          Notes: In case of any errors (e.g. MySQL) just re-run the script. 
 #                 Nothing will be re-installed except for the packages with errors.
 ###################################################################
@@ -52,7 +49,7 @@ update() {
 installApache() {
 	# Apache
 	echo -e "\n ${Cyan} Installing Apache.. ${Color_Off}"
-	sudo apt -qy install apache2 apache2-doc libexpat1 ssl-cert
+	sudo apt -qy install apache2 apache2-doc libexpat1 ssl-cert libapache2-mod-fastcgi
 	# check Apache configuration: apachectl configtest
 }
 
@@ -72,7 +69,7 @@ installPHP() {
 	# PHP and Modules
 	echo -e "\n ${Cyan} Installing PHP and common Modules.. ${Color_Off}"
   # PHP7 (latest)
-	sudo apt -qy install php php-common libapache2-mod-php php-curl php-gd php-mbstring php-mysql php-xml php-zip php-json
+	sudo apt -qy install php php-fpm php-common libapache2-mod-php php-curl php-gd php-mbstring php-mysql php-xml php-zip php-json
 }
 
 installMySQL() {
@@ -165,6 +162,7 @@ echo -e "\n${Green} SUCCESS! MySQL password is: ${PASS_MYSQL_ROOT} ${Color_Off}"
 # - [ ] Email password (or add it to MOTD)
 
 # LINKS
+# http://github.com/aamnah/bash-scripts
 # https://www.howtogeek.com/howto/30184/10-ways-to-generate-a-random-password-from-the-command-line/
 # https://serversforhackers.com/c/installing-mysql-with-debconf
 # https://gist.github.com/Mins/4602864
